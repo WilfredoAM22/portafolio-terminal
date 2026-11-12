@@ -1,3 +1,4 @@
+import {useEffect, useRef, useState} from 'react';
 import {socialLinks} from '../data/socialLinks.js';
 
 const icons = {
@@ -39,8 +40,36 @@ const icons = {
 };
 
 export default function SocialLinks() {
+    const linksRef = useRef(null);
+    const [hasEntered, setHasEntered] = useState(false);
+
+    useEffect(() => {
+        if (!linksRef.current) {
+            return undefined;
+        }
+
+        if (!('IntersectionObserver' in window)) {
+            const frame = window.requestAnimationFrame(() => setHasEntered(true));
+            return () => window.cancelAnimationFrame(frame);
+        }
+
+        const observer = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting) {
+                setHasEntered(true);
+                observer.disconnect();
+            }
+        }, {threshold: 0.15});
+
+        observer.observe(linksRef.current);
+        return () => observer.disconnect();
+    }, []);
+
     return (
-        <nav className="Portfolio-channels" aria-label="Redes sociales">
+        <nav
+            ref={linksRef}
+            className={`Portfolio-channels${hasEntered ? ' is-visible' : ''}`}
+            aria-label="Redes sociales"
+        >
             {socialLinks.map(({nombre, url, icon}) => (
                 <a key={nombre} href={url} target="_blank" rel="noopener noreferrer">
                     {icons[icon]}

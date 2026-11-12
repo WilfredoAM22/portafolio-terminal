@@ -1,6 +1,8 @@
 import {useEffect, useRef} from 'react';
 import SocialLinks from './SocialLinks.jsx';
 
+const currentYear = new Date().getFullYear();
+
 export default function PortfolioFooter({scrollRequest}) {
     const footerRef = useRef(null);
 
@@ -20,6 +22,10 @@ export default function PortfolioFooter({scrollRequest}) {
             <h2>Contacto</h2>
             <p>Encuéntrame también en estas plataformas:</p>
             <SocialLinks/>
+            <p className="Portfolio-attribution">
+                Wilfredo Alexis Mariano · {currentYear} · Hecho con React
+                <span className="Portfolio-footer-cursor" aria-hidden="true"/>
+            </p>
         </footer>
     );
 }

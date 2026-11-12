@@ -71,12 +71,30 @@ input {
 }
 
 .Terminal-container {
+    position: relative;
     width: min(100%, 680px);
     overflow: hidden;
+    opacity: 0;
+    transform: translateY(12px);
     border: 1px solid var(--border-default);
     border-radius: var(--radius-window);
     background: var(--bg-window);
     box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.28);
+    animation: terminal-window-enter 300ms ease-out forwards, terminal-crt-flicker 5s ease-in-out 1s infinite;
+}
+
+.Terminal-container::after {
+    position: absolute;
+    z-index: 4;
+    inset: 42px 0 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 2px,
+        rgba(127, 163, 179, 0.04) 3px
+    );
+    content: "";
+    pointer-events: none;
 }
 
 .Terminal-header {
@@ -121,12 +139,207 @@ input {
     font-weight: 400;
 }
 
+.Terminal-monogram {
+    position: absolute;
+    right: 14px;
+    width: 30px;
+    height: 20px;
+    overflow: visible;
+}
+
+.Terminal-monogram-draw {
+    fill: none;
+    stroke: var(--terminal-prompt-symbol);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: terminal-monogram-draw 800ms ease-out 300ms forwards;
+    filter: drop-shadow(0 0 3px rgba(56, 182, 232, 0.28));
+}
+
+.Terminal-title h2 {
+    padding: 0 42px;
+}
+
 .Terminal-output {
+    position: relative;
     min-height: 190px;
     overflow: visible;
-    padding: 1.25rem;
+    padding: 1.25rem 1.25rem 5.5rem;
     font-size: var(--font-size-terminal);
     line-height: var(--line-height-terminal);
+}
+
+.Javita {
+    position: absolute;
+    right: 1rem;
+    bottom: 0.75rem;
+    z-index: 2;
+    width: 56px;
+    height: 56px;
+}
+
+.Javita-button {
+    display: block;
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+}
+
+.Javita-button:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 3px;
+}
+
+.Javita-button:disabled {
+    cursor: default;
+}
+
+.Javita-illustration {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    transform-origin: center bottom;
+}
+
+.Javita-steam-line {
+    animation: javita-steam 3.2s ease-in-out infinite;
+}
+
+.Javita-steam-line-delayed {
+    animation-delay: 1.1s;
+}
+
+.Javita-eyes {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: javita-blink 5s infinite;
+}
+
+.Javita-tip {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 0.4rem);
+    width: max-content;
+    max-width: 220px;
+    margin: 0;
+    padding: 0.45rem 0.65rem;
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    background: var(--bg-titlebar);
+    color: var(--text-primary);
+    line-height: 1.4;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.28);
+    transition: opacity 150ms ease;
+}
+
+.Javita-illustration[data-reaction="help"] {
+    animation: javita-help-lift 600ms ease-out;
+}
+
+.Javita-illustration[data-reaction="about"] {
+    animation: javita-about-tilt 620ms ease-out;
+}
+
+.Javita-illustration[data-reaction="skills"] .Javita-eyes {
+    animation: javita-blink 5s infinite, javita-skills-confidence 560ms ease-in-out;
+}
+
+.Javita-illustration[data-reaction="projects"] {
+    animation: javita-projects-present 680ms ease-out;
+}
+
+.Javita-illustration[data-reaction="contact"] {
+    animation: javita-contact-invite 640ms ease-in-out;
+}
+
+.Javita-illustration[data-reaction="escribeme"] {
+    animation: javita-escribeme-listen 700ms ease-out;
+}
+
+.Javita-illustration[data-reaction="cancelar"] {
+    animation: javita-cancelar-reset 620ms ease-out;
+}
+
+.Javita-illustration[data-reaction="clear"] {
+    animation: javita-clear-turn 700ms ease-in-out;
+}
+
+.Javita-illustration[data-reaction="unknown"] {
+    animation: javita-unknown-confusion 680ms ease-in-out;
+}
+
+@keyframes javita-steam {
+    0%, 100% { transform: translateY(0); opacity: 0.35; }
+    50% { transform: translateY(-2px); opacity: 0.9; }
+}
+
+@keyframes javita-blink {
+    0%, 92%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.1); }
+}
+
+@keyframes javita-help-lift {
+    30% { transform: translateY(-4px) rotate(-2deg); }
+    65% { transform: translateY(-2px) rotate(-1deg); }
+    100% { transform: translateY(0) rotate(0); }
+}
+
+@keyframes javita-about-tilt {
+    35% { transform: rotate(7deg); }
+    70% { transform: rotate(4deg); }
+    100% { transform: rotate(0); }
+}
+
+@keyframes javita-skills-confidence {
+    20% { transform: scaleY(0.1); }
+    42% { transform: scaleY(1.25); }
+    68% { transform: scaleY(0.85); }
+    100% { transform: scaleY(1); }
+}
+
+@keyframes javita-projects-present {
+    32% { transform: translateY(3px) scale(1.06); }
+    72% { transform: translateY(1px) scale(1.025); }
+    100% { transform: translateY(0) scale(1); }
+}
+
+@keyframes javita-contact-invite {
+    28% { transform: translateX(-4px) rotate(-3deg); }
+    58% { transform: translateX(3px) rotate(2deg); }
+    100% { transform: translateX(0) rotate(0); }
+}
+
+@keyframes javita-escribeme-listen {
+    30% { transform: translateY(2px) rotate(-5deg) scale(1.035); }
+    65% { transform: translateY(1px) rotate(-3deg) scale(1.02); }
+    100% { transform: translateY(0) rotate(0) scale(1); }
+}
+
+@keyframes javita-cancelar-reset {
+    25% { transform: translateY(-2px) rotate(5deg); }
+    60% { transform: translateY(1px) rotate(-2deg); }
+    100% { transform: translateY(0) rotate(0); }
+}
+
+@keyframes javita-clear-turn {
+    25% { transform: rotate(-7deg); opacity: 0.82; }
+    60% { transform: rotate(6deg); opacity: 0.92; }
+    100% { transform: rotate(0); opacity: 1; }
+}
+
+@keyframes javita-unknown-confusion {
+    22% { transform: rotate(-5deg) translateY(1px); opacity: 0.88; }
+    48% { transform: rotate(-5deg) translateY(1px); opacity: 0.88; }
+    72% { transform: rotate(4deg) translateY(-1px); opacity: 0.95; }
+    100% { transform: rotate(0) translateY(0); opacity: 1; }
 }
 
 .Terminal-typed-line {
@@ -138,6 +351,7 @@ input {
 
 .Terminal-prompt-symbol {
     color: var(--terminal-prompt-symbol);
+    text-shadow: 0 0 5px rgba(56, 182, 232, 0.34);
 }
 
 .Terminal-cursor {
@@ -148,7 +362,38 @@ input {
     margin-left: 1px;
     vertical-align: -3px;
     background: var(--terminal-cursor);
+    box-shadow: 0 0 6px rgba(56, 182, 232, 0.38);
     animation: terminal-cursor-blink 1s steps(1, end) infinite;
+}
+
+.Terminal-monogram-cursor {
+    fill: none;
+    stroke: var(--terminal-prompt-symbol);
+    stroke-width: 2;
+    stroke-linecap: round;
+    opacity: 0;
+    animation: terminal-monogram-cursor 1s steps(1, end) 1.1s infinite;
+}
+
+@keyframes terminal-window-enter {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes terminal-crt-flicker {
+    0%, 100% { box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.28), 0 0 0 rgba(56, 182, 232, 0); }
+    50% { box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.28), 0 0 12px rgba(56, 182, 232, 0.025); }
+}
+
+@keyframes terminal-monogram-draw {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes terminal-monogram-cursor {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
 }
 
 @keyframes terminal-cursor-blink {
@@ -314,6 +559,23 @@ input {
     color: var(--text-secondary);
 }
 
+.Portfolio-attribution {
+    margin: 1.25rem 0 0 !important;
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.Portfolio-footer-cursor {
+    display: inline-block;
+    width: 7px;
+    height: 14px;
+    margin-left: 4px;
+    vertical-align: -2px;
+    background: var(--terminal-cursor);
+    box-shadow: 0 0 5px rgba(56, 182, 232, 0.35);
+    animation: terminal-cursor-blink 1s steps(1, end) infinite;
+}
+
 .Portfolio-channels {
     display: flex;
     flex-wrap: wrap;
@@ -327,7 +589,26 @@ input {
     color: #38b6e8;
     text-decoration: underline;
     text-underline-offset: 3px;
-    transition: color 150ms ease;
+    opacity: 0;
+    transform: translateY(8px);
+    text-shadow: 0 0 0 rgba(125, 211, 245, 0);
+    transition: color 150ms ease, transform 150ms ease, opacity 250ms ease, text-shadow 150ms ease;
+}
+
+.Portfolio-channels.is-visible a {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.Portfolio-channels.is-visible a:nth-child(1) { transition-delay: 0ms, 0ms, 0ms, 0ms; }
+.Portfolio-channels.is-visible a:nth-child(2) { transition-delay: 80ms, 80ms, 80ms, 80ms; }
+.Portfolio-channels.is-visible a:nth-child(3) { transition-delay: 160ms, 160ms, 160ms, 160ms; }
+.Portfolio-channels.is-visible a:nth-child(4) { transition-delay: 240ms, 240ms, 240ms, 240ms; }
+
+.Portfolio-channels a:hover,
+.Portfolio-channels a:focus-visible {
+    color: #7dd3f5;
+    text-shadow: 0 0 8px rgba(125, 211, 245, 0.28);
 }
 
 .Portfolio-channels svg {
@@ -345,7 +626,7 @@ input {
 
 .Portfolio-channels a:hover svg,
 .Portfolio-channels a:focus-visible svg {
-    transform: translateY(-1px);
+    transform: translateY(-2px);
 }
 
 .Portfolio-channels a:focus-visible {
@@ -360,7 +641,11 @@ input {
     }
 
     .Terminal-output {
-        padding: 1rem;
+        padding: 1rem 1rem 5.5rem;
+    }
+
+    .Terminal-title h2 {
+        padding: 0 38px;
     }
 
     .Terminal-input {
@@ -373,6 +658,16 @@ input {
 
     .Terminal-input-value {
         font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .Javita {
+        display: none;
+    }
+
+    .Terminal-output {
+        padding-bottom: 1rem;
     }
 }
 
@@ -390,9 +685,45 @@ input {
         animation: none;
     }
 
+    .Terminal-container,
+    .Terminal-monogram-draw,
+    .Terminal-monogram-cursor,
+    .Portfolio-footer-cursor {
+        animation: none;
+    }
+
+    .Terminal-container {
+        opacity: 1;
+        transform: none;
+    }
+
+    .Terminal-monogram-draw {
+        stroke-dashoffset: 0;
+    }
+
+    .Terminal-monogram-cursor {
+        opacity: 1;
+    }
+
+    .Javita-steam-line,
+    .Javita-eyes,
+    .Javita-illustration {
+        animation: none !important;
+    }
+
+    .Javita-tip {
+        transition: none;
+    }
+
     .Portfolio-channels a,
     .Portfolio-channels svg {
         transition: none;
+    }
+
+    .Portfolio-channels a {
+        opacity: 1;
+        transform: none;
+        text-shadow: none;
     }
 
     .Portfolio-channels a:hover svg,

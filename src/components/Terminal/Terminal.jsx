@@ -4,6 +4,7 @@ import {portfolioContent} from '../../data/portfolioContent.js';
 import {terminalLines} from '../../data/terminalLines.js';
 import {sendContactMessage} from '../../services/contact.js';
 import CommandSuggestions from './CommandSuggestions.jsx';
+import Javita from './Javita.jsx';
 import {sonidoClear} from './sonido.js';
 import TerminalHistory from './TerminalHistory.jsx';
 import TerminalShell from './TerminalShell.jsx';
@@ -14,6 +15,7 @@ const TERMINAL_STATE = {
     WRITING: 'WRITING',
     SENDING: 'SENDING',
     RESULT: 'RESULT',
+    SELECTING_CV: 'SELECTING_CV',
 };
 
 const CONTACT_FIELDS = [
@@ -47,6 +49,9 @@ function Terminal({
     const [isOutputTyping, setIsOutputTyping] = useState(false);
     const [bootComplete, setBootComplete] = useState(false);
     const [showBootLines, setShowBootLines] = useState(true);
+    const [activityVersion, setActivityVersion] = useState(0);
+    const [javitaReaction, setJavitaReaction] = useState('rest');
+    const [javitaReactionVersion, setJavitaReactionVersion] = useState(0);
     const [terminalState, setTerminalState] = useState(TERMINAL_STATE.NORMAL);
     const [writingStep, setWritingStep] = useState(0);
     const [contactDraft, setContactDraft] = useState(EMPTY_CONTACT);
@@ -67,6 +72,22 @@ function Terminal({
             {tipo: 'comando', texto: command, sonidoFinal: 'enter'},
             {tipo: 'respuesta', texto: response, error},
         ]);
+    };
+
+    const reactToCommand = (command) => {
+        const reaction = {
+            help: 'help',
+            about: 'about',
+            skills: 'skills',
+            projects: 'projects',
+            contact: 'contact',
+            escribeme: 'escribeme',
+            cancelar: 'cancelar',
+            clear: 'clear',
+        }[command] ?? 'unknown';
+
+        setJavitaReaction(reaction);
+        setJavitaReactionVersion((version) => version + 1);
     };
 
     const resetContact = () => {
@@ -111,6 +132,7 @@ function Terminal({
             return;
         }
 
+        reactToCommand(normalizedCommand);
         let response;
         let error = false;
         const sound = knownCommands.has(normalizedCommand) ? 'enter' : 'error';
@@ -137,6 +159,16 @@ function Terminal({
             case 'projects':
                 response = portfolioContent.projects.join('\n');
                 break;
+            case 'download-cv':
+                setTerminalState(TERMINAL_STATE.SELECTING_CV);
+                response = [
+                    'Currículum disponible',
+                    '- 1 — English version.',
+                    '- 2 — Versión en español.',
+                    '- 3 — Descargar ambas versiones.',
+                    'Escribe cancelar para salir.',
+                ].join('\n');
+                break;
             case 'escribeme':
                 setContactDraft(EMPTY_CONTACT);
                 setWritingStep(0);
@@ -148,7 +180,13 @@ function Terminal({
                 if (sonido) {
                     sonidoClear();
                 }
-                setHistory([]);
+                setHistory([
+                    {tipo: 'comando', texto: normalizedCommand, sonidoFinal: null},
+                    {
+                        tipo: 'respuesta',
+                        texto: `Comandos disponibles:\n${commandDescriptions}`,
+                    },
+                ]);
                 setHistoryEpoch((epoch) => epoch + 1);
                 setShowBootLines(false);
                 return;
@@ -172,6 +210,7 @@ function Terminal({
         const normalizedValue = value.trim();
 
         if (normalizedValue.toLowerCase() === 'cancelar') {
+            reactToCommand('cancelar');
             appendHistory('cancelar', 'Redacción cancelada. La terminal está en modo normal.');
             resetContact();
             return;
@@ -216,6 +255,37 @@ function Terminal({
         setContactStatus(`${nextField.label}:`);
     };
 
+
+    const handleCvSelection = (value) => {
+        const normalizedValue = value.trim().toLowerCase();
+
+        if (normalizedValue === 'cancelar') {
+            setTerminalState(TERMINAL_STATE.NORMAL);
+            appendHistory('cancelar', 'Selección de currículum cancelada.');
+            return;
+        }
+
+        let response;
+
+        switch (normalizedValue) {
+            case '1':
+                response = 'Has seleccionado la versión en inglés.';
+                break;
+            case '2':
+                response = 'Has seleccionado la versión en español.';
+                break;
+            case '3':
+                response = 'Has seleccionado ambas versiones.';
+                break;
+            default:
+                appendHistory(value, 'Opción no válida. Selecciona 1, 2, 3 o escribe cancelar.', true);
+                return;
+        }
+
+        appendHistory(value, response);
+        setTerminalState(TERMINAL_STATE.NORMAL);
+    };
+
     const handleSubmit = (event) => {
         event.preventDefault();
 
@@ -223,8 +293,14 @@ function Terminal({
             return;
         }
 
+        setActivityVersion((version) => version + 1);
         const value = prompt;
         setPrompt('');
+
+        if (terminalState === TERMINAL_STATE.SELECTING_CV){
+            handleCvSelection(value);
+            return;
+        }
 
         if (terminalState === TERMINAL_STATE.WRITING) {
             handleWritingInput(value);
@@ -237,6 +313,7 @@ function Terminal({
             } else if (value.trim().toLowerCase() === 'reintentar') {
                 void sendContact();
             } else if (value.trim().toLowerCase() === 'cancelar') {
+                reactToCommand('cancelar');
                 resetContact();
             } else {
                 setContactStatus('Escribe reintentar para volver a enviar o cancelar para regresar.');
@@ -256,14 +333,19 @@ function Terminal({
 
     const selectCommand = (commandName) => {
         setPrompt(commandName);
+        setActivityVersion((version) => version + 1);
         inputRef.current?.focus();
     };
 
+    const canShowJavitaSuggestions = bootComplete
+        && terminalState === TERMINAL_STATE.NORMAL
+        && !isOutputTyping;
     const inputPlaceholder = {
         [TERMINAL_STATE.NORMAL]: '',
         [TERMINAL_STATE.WRITING]: writingStep < CONTACT_FIELDS.length
             ? `Escribe: ${CONTACT_FIELDS[writingStep].label.toLowerCase()}`
             : 'Escribe enviar o cancelar…',
+        [TERMINAL_STATE.SELECTING_CV]:'Selecciona 1, 2, 3 o cancelar…',
         [TERMINAL_STATE.SENDING]: 'Enviando…',
         [TERMINAL_STATE.RESULT]: result?.success
             ? 'Presiona Enter para volver…'
@@ -293,7 +375,11 @@ function Terminal({
                         ref={inputRef}
                         placeholder={inputPlaceholder}
                         className="Terminal-input-field"
-                        onChange={(event) => setPrompt(event.target.value)}
+                        onChange={(event) => {
+                            setPrompt(event.target.value);
+                            setActivityVersion((version) => version + 1);
+                        }}
+                        onFocus={() => setActivityVersion((version) => version + 1)}
                         autoComplete="off"
                         disabled={terminalState === TERMINAL_STATE.SENDING || isOutputTyping}
                         aria-label={terminalState === TERMINAL_STATE.NORMAL ? 'Escribe un comando' : 'Entrada de terminal'}
@@ -305,6 +391,14 @@ function Terminal({
                         <CommandSuggestions commands={filteredCommands} onSelect={selectCommand}/>
                     )}
                 </form>
+            )}
+            mascot={bootComplete && (
+                <Javita
+                    active={canShowJavitaSuggestions}
+                    activityVersion={activityVersion}
+                    reaction={javitaReaction}
+                    reactionVersion={javitaReactionVersion}
+                />
             )}
         >
             <TerminalWelcome
