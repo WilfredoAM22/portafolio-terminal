@@ -1,0 +1,391 @@
+:root {
+    color-scheme: dark;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+    background: var(--bg-page);
+    color: var(--text-primary);
+    font-family: "Fira Code", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--font-size-terminal);
+}
+
+button,
+input {
+    font: inherit;
+}
+
+.App-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1.25rem;
+    padding: clamp(1.25rem, 6vh, 3rem) 1rem 2rem;
+}
+
+.Terminal-entry-screen {
+    width: min(100%, 680px);
+    text-align: center;
+}
+
+.Terminal-entry-screen h1 {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+}
+
+.Terminal-entry-screen p {
+    margin: 0 0 1.25rem;
+    color: var(--text-secondary);
+}
+
+.Terminal-toolbar {
+    width: min(100%, 680px);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.Terminal-action-button {
+    border: 1px solid var(--border-default);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-titlebar);
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.Terminal-action-button:hover {
+    border-color: var(--terminal-cursor);
+}
+
+.Terminal-container {
+    width: min(100%, 680px);
+    overflow: hidden;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-window);
+    background: var(--bg-window);
+    box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.28);
+}
+
+.Terminal-header {
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border-bottom: 1px solid var(--border-default);
+    background: var(--bg-titlebar);
+}
+
+.Terminal-controls {
+    position: absolute;
+    left: 14px;
+    display: flex;
+    gap: 7px;
+}
+
+.Terminal-controls span {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+}
+
+.Terminal-controls span:nth-child(1) {
+    background: var(--window-dot-close);
+}
+
+.Terminal-controls span:nth-child(2) {
+    background: var(--window-dot-minimize);
+}
+
+.Terminal-controls span:nth-child(3) {
+    background: var(--window-dot-expand);
+}
+
+.Terminal-title h2 {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.Terminal-output {
+    min-height: 190px;
+    overflow: visible;
+    padding: 1.25rem;
+    font-size: var(--font-size-terminal);
+    line-height: var(--line-height-terminal);
+}
+
+.Terminal-typed-line {
+    min-height: 1.75em;
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.Terminal-prompt-symbol {
+    color: var(--terminal-prompt-symbol);
+}
+
+.Terminal-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 16px;
+    flex: 0 0 8px;
+    margin-left: 1px;
+    vertical-align: -3px;
+    background: var(--terminal-cursor);
+    animation: terminal-cursor-blink 1s steps(1, end) infinite;
+}
+
+@keyframes terminal-cursor-blink {
+    50% {
+        visibility: hidden;
+    }
+}
+
+.Terminal-commands {
+    margin: 1.25rem 0;
+}
+
+.Terminal-commands > p {
+    margin: 0 0 0.5rem;
+    color: var(--text-secondary);
+}
+
+.Terminal-command-list,
+.Terminal-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.Terminal-command-list button,
+.Terminal-suggestions button {
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--border-default);
+    border-radius: 5px;
+    background: transparent;
+    color: var(--terminal-cursor);
+    cursor: pointer;
+}
+
+.Terminal-command-list button:hover,
+.Terminal-suggestions button:hover {
+    border-color: var(--terminal-cursor);
+}
+
+.Terminal-command-list button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.Terminal-entry {
+    margin-top: 1rem;
+}
+
+.Terminal-entry p {
+    margin: 0 0 0.35rem;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.Terminal-entry-command {
+    color: var(--text-primary);
+}
+
+.Terminal-entry-response,
+.Terminal-contact-status {
+    color: var(--text-secondary);
+}
+
+.Terminal-error-line {
+    color: var(--terminal-error);
+}
+
+.Terminal-contact-result.is-success {
+    color: var(--state-success);
+}
+
+.Terminal-contact-result.is-error {
+    color: var(--state-error);
+}
+
+.Terminal-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-height: 52px;
+    padding: 0.9rem 1.25rem;
+    border-top: 1px solid var(--border-default);
+    background: var(--bg-titlebar);
+}
+
+.Terminal-input > span:first-of-type {
+    color: var(--terminal-prompt-symbol);
+    white-space: nowrap;
+}
+
+.Terminal-input label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.Terminal-input-field {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: text;
+}
+
+.Terminal-input-value {
+    min-width: 0;
+    flex: 1 1 0;
+    color: var(--text-primary);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.Terminal-input-field:disabled {
+    cursor: wait;
+}
+
+.Terminal-input.is-disabled .Terminal-input-cursor,
+.Terminal-input.is-typing .Terminal-input-cursor {
+    visibility: hidden;
+}
+
+.Terminal-suggestions {
+    position: absolute;
+    z-index: 1;
+    right: 1.25rem;
+    bottom: calc(100% + 0.25rem);
+    left: 1.25rem;
+    padding: 0.5rem;
+    border: 1px solid var(--border-default);
+    border-radius: 6px;
+    background: var(--bg-window);
+}
+
+.Portfolio-footer {
+    width: min(100%, 680px);
+    padding: 1.25rem;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-window);
+    background: var(--bg-window);
+}
+
+.Portfolio-footer h2 {
+    margin: 0 0 0.5rem;
+}
+
+.Portfolio-footer p {
+    margin: 0 0 0.75rem;
+    color: var(--text-secondary);
+}
+
+.Portfolio-channels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 1.25rem;
+}
+
+.Portfolio-channels a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #38b6e8;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 150ms ease;
+}
+
+.Portfolio-channels svg {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    color: currentColor;
+    transition: transform 150ms ease;
+}
+
+.Portfolio-channels a:hover,
+.Portfolio-channels a:focus-visible {
+    color: #7dd3f5;
+}
+
+.Portfolio-channels a:hover svg,
+.Portfolio-channels a:focus-visible svg {
+    transform: translateY(-1px);
+}
+
+.Portfolio-channels a:focus-visible {
+    outline: 2px solid #7dd3f5;
+    outline-offset: 4px;
+    border-radius: 2px;
+}
+
+@media (max-width: 36rem) {
+    .App-container {
+        padding: 1rem 0.5rem 1.5rem;
+    }
+
+    .Terminal-output {
+        padding: 1rem;
+    }
+
+    .Terminal-input {
+        padding: 0.85rem 1rem;
+    }
+
+    .Terminal-input > span {
+        font-size: 11px;
+    }
+
+    .Terminal-input-value {
+        font-size: 12px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+
+    .Terminal-cursor {
+        visibility: visible;
+        animation: none;
+    }
+
+    .Portfolio-channels a,
+    .Portfolio-channels svg {
+        transition: none;
+    }
+
+    .Portfolio-channels a:hover svg,
+    .Portfolio-channels a:focus-visible svg {
+        transform: none;
+    }
+}

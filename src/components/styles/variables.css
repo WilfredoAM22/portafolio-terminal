@@ -1,0 +1,22 @@
+:root {
+    --bg-page: #0b1820;
+    --bg-window: #0d1b24;
+    --bg-titlebar: #11222d;
+    --border-default: rgba(127, 163, 179, 0.28);
+
+    --text-primary: #cfeaf5;
+    --text-secondary: #7fa3b3;
+    --terminal-prompt-symbol: #38b6e8;
+    --terminal-cursor: #38b6e8;
+    --terminal-error: #d98a8a;
+    --state-success: #30d158;
+    --state-error: #ff453a;
+
+    --window-dot-close: #ff5f57;
+    --window-dot-minimize: #febc2e;
+    --window-dot-expand: #28c840;
+
+    --font-size-terminal: 14px;
+    --line-height-terminal: 1.75;
+    --radius-window: 12px;
+}
