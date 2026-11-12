@@ -87,9 +87,7 @@ export function RespuestaApareciendo({linea, sonido = false, onComplete}) {
 export default function TerminalWelcome({
                                             lineas = [],
                                             sonido = false,
-                                            titulo = 'wilfredo@portfolio — terminal',
                                             onComplete,
-                                            controls,
                                             children,
                                         }) {
     const [indice, setIndice] = useState(0);
@@ -110,42 +108,28 @@ export default function TerminalWelcome({
     }, [complete, onComplete]);
 
     return (
-        <section className="Terminal-container" aria-label="Terminal interactiva">
-            <div className="Terminal-header">
-                <div className="Terminal-controls" aria-hidden="true">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-                <div className="Terminal-title">
-                    <h2>{titulo}</h2>
-                </div>
-            </div>
+        <>
+            {lineas.slice(0, indice).map((linea, index) => (
+                <LineaCompleta key={index} linea={linea}/>
+            ))}
 
-            <div className="Terminal-output" aria-live="polite">
-                {lineas.slice(0, indice).map((linea, index) => (
-                    <LineaCompleta key={index} linea={linea}/>
-                ))}
+            {!complete && activeLine && (
+                activeLine.tipo === 'respuesta'
+                    ? <RespuestaApareciendo
+                        key={indice}
+                        linea={activeLine}
+                        sonido={sonido}
+                        onComplete={avanzar}
+                    />
+                    : <LineaEscribiendo
+                        key={indice}
+                        linea={activeLine}
+                        sonido={sonido}
+                        onComplete={avanzar}
+                    />
+            )}
 
-                {!complete && activeLine && (
-                    activeLine.tipo === 'respuesta'
-                        ? <RespuestaApareciendo
-                            key={indice}
-                            linea={activeLine}
-                            sonido={sonido}
-                            onComplete={avanzar}
-                        />
-                        : <LineaEscribiendo
-                            key={indice}
-                            linea={activeLine}
-                            sonido={sonido}
-                            onComplete={avanzar}
-                        />
-                )}
-
-                {complete && children}
-            </div>
-            {complete && controls}
-        </section>
+            {complete && children}
+        </>
     );
 }

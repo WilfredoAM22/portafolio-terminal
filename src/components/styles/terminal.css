@@ -2,6 +2,11 @@
     color-scheme: dark;
 }
 
+.Terminal-input:focus-within {
+    outline: 2px solid var(--terminal-cursor);
+    outline-offset: -3px;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -181,6 +186,12 @@ input {
 .Terminal-command-list button:hover,
 .Terminal-suggestions button:hover {
     border-color: var(--terminal-cursor);
+}
+
+.Terminal-command-list button:focus-visible,
+.Terminal-suggestions button:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
 }
 
 .Terminal-command-list button:disabled {

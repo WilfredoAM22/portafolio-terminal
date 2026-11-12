@@ -1,9 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {availableCommands} from '../../data/command.js';
+import {portfolioContent} from '../../data/portfolioContent.js';
 import {terminalLines} from '../../data/terminalLines.js';
 import {sendContactMessage} from '../../services/contact.js';
+import CommandSuggestions from './CommandSuggestions.jsx';
 import {sonidoClear} from './sonido.js';
 import TerminalHistory from './TerminalHistory.jsx';
+import TerminalShell from './TerminalShell.jsx';
 import TerminalWelcome from './TerminalWelcome.jsx';
 
 const TERMINAL_STATE = {
@@ -30,6 +33,7 @@ const EMPTY_CONTACT = {
 const commandDescriptions = availableCommands
     .map(({name, description}) => `${name.padEnd(10)} ${description}`)
     .join('\n');
+const knownCommands = new Set(availableCommands.map(({name}) => name));
 
 function Terminal({
                       onContact,
@@ -107,8 +111,6 @@ function Terminal({
             return;
         }
 
-        const knownCommands = new Set(availableCommands.map(({name}) => name));
-
         let response;
         let error = false;
         const sound = knownCommands.has(normalizedCommand) ? 'enter' : 'error';
@@ -124,30 +126,16 @@ function Terminal({
                 ].join('\n');
                 break;
             case 'about':
-                response = [
-                    'Soy Wilfredo Alexis Mariano, desarrollador de software enfocado en escribir código limpio, resolver problemas complejos y crear soluciones tecnológicas funcionales y bien estructuradas.',
-                    'Siempre estoy en busca de nuevos desafíos que me permitan seguir aprendiendo y creciendo profesionalmente.',
-                ].join('\n');
+                response = portfolioContent.about.join('\n');
                 break;
             case 'contact':
                 response = 'Desplazando hasta el pie de página para mostrar mis canales de contacto.';
                 break;
             case 'skills':
-                response = [
-                    'Mi stack tecnológico y herramientas principales:',
-                    '• Lenguajes: Java, JavaScript, TypeScript, Python, SQL',
-                    '• Frontend: HTML5, CSS3, React, Vite',
-                    '• Backend: APIs REST, bases de datos',
-                    '• Control de versiones: Git, GitHub',
-                    'Actualmente continúo profundizando mis conocimientos rumbo a Full Stack Developer.',
-                ].join('\n');
+                response = portfolioContent.skills.join('\n');
                 break;
             case 'projects':
-                response = [
-                    'Bienvenido a mi espacio de proyectos. Aquí encontrarás aplicaciones web, interfaces interactivas y soluciones desarrolladas durante mi formación como ingeniero de software.',
-                    'Cada proyecto es una oportunidad para aplicar buenas prácticas y resolver problemas reales.',
-                    '¡Más proyectos próximamente!',
-                ].join('\n');
+                response = portfolioContent.projects.join('\n');
                 break;
             case 'escribeme':
                 setContactDraft(EMPTY_CONTACT);
@@ -264,6 +252,7 @@ function Terminal({
             name.startsWith(prompt.trim().toLowerCase())
         )
         : [];
+    const showCommandSuggestions = Boolean(prompt.trim() && filteredCommands.length);
 
     const selectCommand = (commandName) => {
         setPrompt(commandName);
@@ -282,11 +271,8 @@ function Terminal({
     }[terminalState];
 
     return (
-        <TerminalWelcome
-            lineas={showBootLines ? lineas : []}
-            sonido={sonido}
-            titulo={titulo}
-            onComplete={() => setBootComplete(true)}
+        <TerminalShell
+            title={titulo}
             controls={bootComplete && (
                 <form
                     onSubmit={handleSubmit}
@@ -311,51 +297,50 @@ function Terminal({
                         autoComplete="off"
                         disabled={terminalState === TERMINAL_STATE.SENDING || isOutputTyping}
                         aria-label={terminalState === TERMINAL_STATE.NORMAL ? 'Escribe un comando' : 'Entrada de terminal'}
+                        aria-autocomplete="list"
+                        aria-expanded={showCommandSuggestions}
+                        aria-controls={showCommandSuggestions ? 'Terminal-command-suggestions' : undefined}
                     />
-                    {prompt.trim() && filteredCommands.length > 0 && (
-                        <div className="Terminal-suggestions">
-                            {filteredCommands.map(({name}) => (
-                                <button
-                                    key={name}
-                                    type="button"
-                                    onClick={() => selectCommand(name)}
-                                >
-                                    {name}
-                                </button>
-                            ))}
-                        </div>
+                    {showCommandSuggestions && (
+                        <CommandSuggestions commands={filteredCommands} onSelect={selectCommand}/>
                     )}
                 </form>
             )}
         >
-            {bootComplete && (
-                <>
-                    <TerminalHistory
-                        key={historyEpoch}
-                        history={history}
-                        sonido={sonido}
-                        onTypingChange={setIsOutputTyping}
-                        onContactComplete={onContact}
-                    />
+            <TerminalWelcome
+                lineas={showBootLines ? lineas : []}
+                sonido={sonido}
+                onComplete={() => setBootComplete(true)}
+            >
+                {bootComplete && (
+                    <>
+                        <TerminalHistory
+                            key={historyEpoch}
+                            history={history}
+                            sonido={sonido}
+                            onTypingChange={setIsOutputTyping}
+                            onContactComplete={onContact}
+                        />
 
-                    {terminalState === TERMINAL_STATE.WRITING && (
-                        <p className="Terminal-contact-status">{contactStatus}</p>
-                    )}
-                    {terminalState === TERMINAL_STATE.SENDING && (
-                        <p className="Terminal-contact-status" role="status">{contactStatus}</p>
-                    )}
-                    {terminalState === TERMINAL_STATE.RESULT && (
-                        <p
-                            className={`Terminal-contact-result ${result?.success ? 'is-success' : 'is-error'}`}
-                            role={result?.success ? 'status' : 'alert'}
-                        >
-                            {result?.message}
-                            {contactStatus && <><br/>{contactStatus}</>}
-                        </p>
-                    )}
-                </>
-            )}
-        </TerminalWelcome>
+                        {(terminalState === TERMINAL_STATE.WRITING || terminalState === TERMINAL_STATE.SENDING) && (
+                            <p className="Terminal-contact-status" role="status" aria-live="polite">
+                                {contactStatus}
+                            </p>
+                        )}
+                        {terminalState === TERMINAL_STATE.RESULT && (
+                            <p
+                                className={`Terminal-contact-result ${result?.success ? 'is-success' : 'is-error'}`}
+                                role={result?.success ? 'status' : 'alert'}
+                                aria-live={result?.success ? 'polite' : 'assertive'}
+                            >
+                                {result?.message}
+                                {contactStatus && <><br/>{contactStatus}</>}
+                            </p>
+                        )}
+                    </>
+                )}
+            </TerminalWelcome>
+        </TerminalShell>
     );
 }
 

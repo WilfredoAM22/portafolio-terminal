@@ -2,7 +2,7 @@
 
 Este Portafolio con tematica de terminal creado con React y Vite. La terminal presenta una bienvenida animada y permite explorar el perfil con `help`, `about`, `skills`, `projects`, `contact` y `clear`, además de iniciar un flujo de contacto con `escribeme`.
 
-La bienvenida se configura en `src/data/terminalLines.js` como objetos `{ tipo: 'comando' | 'respuesta', texto: '...' }`. Los efectos de sonido se activan después de la primera interacción del usuario, según las restricciones del navegador. La animación respeta la preferencia del sistema para reducir movimiento.
+El contenido del perfil está en `src/data/portfolioContent.js`; los comandos y enlaces sociales se configuran en `src/data/command.js` y `src/data/socialLinks.js`. La bienvenida se configura en `src/data/terminalLines.js` como objetos `{ tipo: 'comando' | 'respuesta', texto: '...' }`. La interfaz separa la ventana, las sugerencias de comandos y el footer en componentes independientes. Los efectos de sonido se activan después de la primera interacción del usuario, según las restricciones del navegador. La animación respeta la preferencia del sistema para reducir movimiento.
 
 ## Desarrollo
 
