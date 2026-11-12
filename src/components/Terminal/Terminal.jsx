@@ -57,8 +57,12 @@ function Terminal({
         }
     }, [bootComplete, isOutputTyping]);
 
-    const appendHistory = (command, response) => {
-        setHistory((previousHistory) => [...previousHistory, {command, response}]);
+    const appendHistory = (command, response, error = false) => {
+        setHistory((previousHistory) => [
+            ...previousHistory,
+            {tipo: 'comando', texto: command, sonidoFinal: 'enter'},
+            {tipo: 'respuesta', texto: response, error},
+        ]);
     };
 
     const resetContact = () => {
@@ -169,12 +173,11 @@ function Terminal({
                 break;
         }
 
-        setHistory((previousHistory) => [...previousHistory, {
-            command: normalizedCommand,
-            response,
-            error,
-            sound,
-        }]);
+        setHistory((previousHistory) => [
+            ...previousHistory,
+            {tipo: 'comando', texto: normalizedCommand, sonidoFinal: sound},
+            {tipo: 'respuesta', texto: response, error},
+        ]);
     };
 
     const handleWritingInput = (value) => {

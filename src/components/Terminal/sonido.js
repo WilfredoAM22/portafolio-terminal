@@ -1,4 +1,5 @@
 let audioContext;
+const noiseBuffers = new Map();
 
 function getAudioContext() {
     if (!audioContext) {
@@ -10,6 +11,23 @@ function getAudioContext() {
     }
 
     return audioContext;
+}
+
+function getNoiseBuffer(context, duration) {
+    if (!noiseBuffers.has(duration)) {
+        const buffer = context.createBuffer(
+            1,
+            Math.ceil(context.sampleRate * duration),
+            context.sampleRate,
+        );
+        const samples = buffer.getChannelData(0);
+        for (let index = 0; index < samples.length; index += 1) {
+            samples[index] = Math.random() * 2 - 1;
+        }
+        noiseBuffers.set(duration, buffer);
+    }
+
+    return noiseBuffers.get(duration);
 }
 
 export async function activarAudio() {
@@ -26,16 +44,10 @@ export function sonidoTecla() {
     }
 
     const now = context.currentTime;
-    const buffer = context.createBuffer(1, Math.ceil(context.sampleRate * 0.05), context.sampleRate);
-    const samples = buffer.getChannelData(0);
-    for (let index = 0; index < samples.length; index += 1) {
-        samples[index] = Math.random() * 2 - 1;
-    }
-
     const noise = context.createBufferSource();
     const bandPass = context.createBiquadFilter();
     const noiseGain = context.createGain();
-    noise.buffer = buffer;
+    noise.buffer = getNoiseBuffer(context, 0.05);
     bandPass.type = 'bandpass';
     bandPass.frequency.value = 2600 + Math.random() * 800;
     noiseGain.gain.setValueAtTime(0.055, now);
@@ -62,16 +74,10 @@ export function sonidoEnter() {
     }
 
     const now = context.currentTime;
-    const buffer = context.createBuffer(1, Math.ceil(context.sampleRate * 0.04), context.sampleRate);
-    const samples = buffer.getChannelData(0);
-    for (let index = 0; index < samples.length; index += 1) {
-        samples[index] = Math.random() * 2 - 1;
-    }
-
     const click = context.createBufferSource();
     const clickFilter = context.createBiquadFilter();
     const clickGain = context.createGain();
-    click.buffer = buffer;
+    click.buffer = getNoiseBuffer(context, 0.04);
     clickFilter.type = 'bandpass';
     clickFilter.frequency.value = 900;
     clickGain.gain.setValueAtTime(0.16, now);
@@ -105,20 +111,10 @@ export function sonidoClear() {
 
     const now = context.currentTime;
     const noiseDuration = 0.4;
-    const buffer = context.createBuffer(
-        1,
-        Math.ceil(context.sampleRate * noiseDuration),
-        context.sampleRate,
-    );
-    const samples = buffer.getChannelData(0);
-    for (let index = 0; index < samples.length; index += 1) {
-        samples[index] = Math.random() * 2 - 1;
-    }
-
     const noise = context.createBufferSource();
     const bandPass = context.createBiquadFilter();
     const noiseGain = context.createGain();
-    noise.buffer = buffer;
+    noise.buffer = getNoiseBuffer(context, noiseDuration);
     bandPass.type = 'bandpass';
     bandPass.Q.value = 2;
     bandPass.frequency.setValueAtTime(3500, now);

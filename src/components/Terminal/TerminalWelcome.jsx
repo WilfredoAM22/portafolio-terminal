@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {memo, useCallback, useEffect, useRef, useState} from 'react';
 import {sonidoEnter, sonidoError, sonidoTecla} from './sonido.js';
 
 const reducedMotionQuery = '(prefers-reduced-motion: reduce)';
@@ -7,7 +7,7 @@ function prefersReducedMotion() {
     return window.matchMedia?.(reducedMotionQuery).matches ?? false;
 }
 
-export function LineaCompleta({linea}) {
+export const LineaCompleta = memo(function LineaCompleta({linea}) {
     if (linea.tipo === 'comando') {
         return (
             <p className="Terminal-typed-line Terminal-typed-command">
@@ -22,7 +22,7 @@ export function LineaCompleta({linea}) {
             {linea.texto}
         </p>
     );
-}
+});
 
 export function LineaEscribiendo({
                                      linea,

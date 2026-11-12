@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {
     LineaCompleta,
     LineaEscribiendo,
@@ -7,13 +7,7 @@ import {
 
 export default function TerminalHistory({history, sonido, onTypingChange, onContactComplete}) {
     const [activeLineIndex, setActiveLineIndex] = useState(0);
-    const lines = useMemo(
-        () => history.flatMap(({command, response, error, sound}) => [
-            {tipo: 'comando', texto: command, sonidoFinal: sound ?? 'enter'},
-            {tipo: 'respuesta', texto: response, error},
-        ]),
-        [history],
-    );
+    const lines = history;
     const complete = activeLineIndex >= lines.length;
 
     const advanceLine = useCallback(() => {
@@ -23,7 +17,7 @@ export default function TerminalHistory({history, sonido, onTypingChange, onCont
     const completeLine = useCallback(() => {
         if (
             activeLineIndex % 2 === 1
-            && history[Math.floor(activeLineIndex / 2)]?.command === 'contact'
+            && history[activeLineIndex - 1]?.texto === 'contact'
         ) {
             onContactComplete?.();
         }
