@@ -88,10 +88,10 @@ input {
     z-index: 4;
     inset: 42px 0 0;
     background: repeating-linear-gradient(
-        to bottom,
-        transparent 0,
-        transparent 2px,
-        rgba(127, 163, 179, 0.04) 3px
+            to bottom,
+            transparent 0,
+            transparent 2px,
+            rgba(127, 163, 179, 0.04) 3px
     );
     content: "";
     pointer-events: none;
@@ -274,6 +274,75 @@ input {
 
 .Javita-illustration[data-reaction="unknown"] {
     animation: javita-unknown-confusion 680ms ease-in-out;
+}
+
+/* ---- Emociones de Javita (independientes de las reacciones) ---- */
+.Javita-eyes-pose {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 300ms ease, opacity 300ms ease;
+}
+
+.Javita-eyes-happy,
+.Javita-eyes-closed {
+    opacity: 0;
+    transition: opacity 300ms ease;
+}
+
+.Javita-mouth {
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: opacity 280ms ease, transform 280ms ease;
+}
+
+.Javita-illustration[data-emotion="tranquila"] .Javita-mouth-smile,
+.Javita-illustration[data-emotion="feliz"] .Javita-mouth-grin,
+.Javita-illustration[data-emotion="pensativa"] .Javita-mouth-flat,
+.Javita-illustration[data-emotion="confiada"] .Javita-mouth-smirk,
+.Javita-illustration[data-emotion="sorprendida"] .Javita-mouth-o,
+.Javita-illustration[data-emotion="divertida"] .Javita-mouth-laugh,
+.Javita-illustration[data-emotion="confundida"] .Javita-mouth-wavy,
+.Javita-illustration[data-emotion="dormida"] .Javita-mouth-o {
+    opacity: 1;
+}
+
+.Javita-illustration[data-emotion="dormida"] .Javita-mouth-o {
+    transform: scale(0.55);
+}
+
+.Javita-illustration[data-emotion="pensativa"] .Javita-eyes-pose {
+    transform: translate(2px, -1.5px);
+}
+
+.Javita-illustration[data-emotion="pensativa"] .Javita-mouth-flat {
+    transform: translateX(1px);
+}
+
+.Javita-illustration[data-emotion="confiada"] .Javita-eyes-pose {
+    transform: translateY(0.03rem) scaleY(0.65);
+}
+
+.Javita-illustration[data-emotion="sorprendida"] .Javita-eyes-pose {
+    transform: scale(1.1, 1.35);
+}
+
+.Javita-illustration[data-emotion="divertida"] .Javita-eyes-pose {
+    transform: translateY(-0.5px) scaleY(1.15);
+}
+
+.Javita-illustration[data-emotion="confundida"] .Javita-eyes-pose {
+    transform: rotate(-10deg);
+}
+
+.Javita-illustration[data-emotion="feliz"] .Javita-eyes-pose,
+.Javita-illustration[data-emotion="dormida"] .Javita-eyes-pose {
+    opacity: 0;
+}
+
+.Javita-illustration[data-emotion="feliz"] .Javita-eyes-happy,
+.Javita-illustration[data-emotion="dormida"] .Javita-eyes-closed {
+    opacity: 1;
 }
 
 @keyframes javita-steam {
@@ -711,6 +780,13 @@ input {
         animation: none !important;
     }
 
+    .Javita-eyes-pose,
+    .Javita-eyes-happy,
+    .Javita-eyes-closed,
+    .Javita-mouth {
+        transition: none;
+    }
+
     .Javita-tip {
         transition: none;
     }
@@ -729,5 +805,37 @@ input {
     .Portfolio-channels a:hover svg,
     .Portfolio-channels a:focus-visible svg {
         transform: none;
+    }
+}
+
+.Portfolio-attribution {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.Portfolio-footer-mascot {
+    display: inline-flex;
+    align-items: center;
+    transform: translateY(-2px);
+    transition: transform 0.25s ease;
+}
+
+.Portfolio-footer-mascot:hover {
+    transform: translateY(-4px) rotate(4deg);
+}
+
+.Portfolio-footer-steam {
+    animation: footerSteam 2.8s ease-in-out infinite;
+}
+
+@keyframes footerSteam {
+    0%, 100% {
+        opacity: 0.45;
+        transform: translateY(0);
+    }
+    50% {
+        opacity: 1;
+        transform: translateY(-1.5px);
     }
 }

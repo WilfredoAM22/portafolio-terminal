@@ -5,15 +5,12 @@ export const portfolioContent = {
     ],
     skills: [
         'Mi stack tecnológico y herramientas principales:',
-        '• Lenguajes: Java, JavaScript, TypeScript, Python, SQL',
-        '• Frontend: HTML5, CSS3, React, Vite',
-        '• Backend: APIs REST, bases de datos',
-        '• Control de versiones: Git, GitHub',
-        'Actualmente continúo profundizando mis conocimientos rumbo a Full Stack Developer.',
+        '• Backend: Java, Spring Boot, APIs REST, SQL',
+        '• Frontend: React, TypeScript, JavaScript, HTML5, CSS3',
+        '• Herramientas: Git, GitHub',
+        'Actualmente continúo profundizando mis conocimientos rumbo a Full Stack Developer.'
     ],
-    projects: [
-        'Bienvenido a mi espacio de proyectos. Aquí encontrarás aplicaciones web, interfaces interactivas y soluciones desarrolladas durante mi formación como ingeniero de software.',
-        'Cada proyecto es una oportunidad para aplicar buenas prácticas y resolver problemas reales.',
-        '¡Más proyectos próximamente!',
-    ],
+    projects: ['Bienvenido a mi espacio de proyectos. Aquí encontrarás aplicaciones web Full Stack, APIs robustas e interfaces interactivas.',
+        'Cada desarrollo refleja mi enfoque en escribir código limpio, aplicar buenas prácticas y resolver problemas reales.',
+        'Construyendo y desplegando nuevas soluciones constantemente.'],
 };

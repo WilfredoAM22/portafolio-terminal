@@ -1,15 +1,41 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import {availableCommands} from '../../data/command.js';
+import {sonidoJavita} from './sonido.js';
 
 const SUGGESTION_ORDER = ['help', 'projects', 'contact'];
 const IDLE_DELAY = 6000;
+const EMOTIONS = [
+    'tranquila',
+    'feliz',
+    'pensativa',
+    'confiada',
+    'sorprendida',
+    'divertida',
+    'confundida',
+    'dormida',
+];
 
-function JavitaIllustration({reaction, reactionVersion}) {
+function JavitaIllustration({emotion, reaction, reactionVersion}) {
+    const svgRef = useRef(null);
+
+    // Reinicia la animación de la reacción sin recrear el SVG,
+    // para que las expresiones puedan hacer transiciones graduales.
+    useLayoutEffect(() => {
+        const svg = svgRef.current;
+        if (!svg || reactionVersion === 0) {
+            return;
+        }
+
+        svg.removeAttribute('data-reaction');
+        void svg.getBoundingClientRect();
+        svg.setAttribute('data-reaction', reaction);
+    }, [reaction, reactionVersion]);
+
     return (
         <svg
-            key={reactionVersion}
+            ref={svgRef}
             className="Javita-illustration"
-            data-reaction={reaction}
+            data-emotion={emotion}
             viewBox="0 0 64 64"
             aria-hidden="true"
             focusable="false"
@@ -30,17 +56,43 @@ function JavitaIllustration({reaction, reactionVersion}) {
                 <circle cx="38.5" cy="40" r="2"/>
             </g>
             <g fill="none" stroke="#cfeaf5" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                <g className="Javita-eyes">
-                    <path d="M22 34v3"/>
-                    <path d="M34 34v3"/>
+                <g className="Javita-eyes-pose">
+                    <g className="Javita-eyes">
+                        <path d="M22 34v3"/>
+                        <path d="M34 34v3"/>
+                    </g>
                 </g>
-                <path d="M25.5 42q2.5 2 5 0" strokeWidth="2.5"/>
+                <g className="Javita-eyes-happy" strokeWidth="2.5">
+                    <path d="M19.5 37q2.5-4 5 0"/>
+                    <path d="M31.5 37q2.5-4 5 0"/>
+                </g>
+                <g className="Javita-eyes-closed" strokeWidth="2.5">
+                    <path d="M19.5 35q2.5 3 5 0"/>
+                    <path d="M31.5 35q2.5 3 5 0"/>
+                </g>
+                <g className="Javita-mouths" strokeWidth="2.5">
+                    <path className="Javita-mouth Javita-mouth-smile" d="M25.5 42q2.5 2 5 0"/>
+                    <path className="Javita-mouth Javita-mouth-grin" d="M23.5 41.5q4.5 4.5 9 0"/>
+                    <path className="Javita-mouth Javita-mouth-flat" d="M26 42.5h4"/>
+                    <path className="Javita-mouth Javita-mouth-smirk" d="M25.5 43q3 0 5-2"/>
+                    <path className="Javita-mouth Javita-mouth-wavy" d="M24.5 42.5q1.5-2 3 0t3 0"/>
+                    <path className="Javita-mouth Javita-mouth-laugh" d="M23.5 41.5h9a4.5 4.5 0 0 1-9 0z"
+                          fill="#cfeaf5" strokeWidth="1.5"/>
+                    <ellipse className="Javita-mouth Javita-mouth-o" cx="28" cy="43" rx="1.8" ry="2.2"/>
+                </g>
             </g>
         </svg>
     );
 }
 
-export default function Javita({active, activityVersion, reaction, reactionVersion}) {
+export default function Javita({
+                                   active,
+                                   activityVersion,
+                                   emotion = 'tranquila',
+                                   reaction,
+                                   reactionVersion,
+                                   sonido = true,
+                               }) {
     const suggestions = useMemo(
         () => availableCommands
             .filter(({name}) => SUGGESTION_ORDER.includes(name))
@@ -53,6 +105,7 @@ export default function Javita({active, activityVersion, reaction, reactionVersi
     const [tipActivityVersion, setTipActivityVersion] = useState(null);
     const timerRef = useRef(null);
     const isTipVisible = active && tipActivityVersion === activityVersion;
+    const currentEmotion = EMOTIONS.includes(emotion) ? emotion : 'tranquila';
 
     const clearTimer = useCallback(() => {
         if (timerRef.current !== null) {
@@ -92,11 +145,14 @@ export default function Javita({active, activityVersion, reaction, reactionVersi
 
     const suggestion = suggestions[Math.max(suggestionIndex, 0)];
     const tip = suggestion?.name === 'help' && suggestionIndex === 0
-        ? '¿Perdido? Prueba help'
+        ? '¿Sin mapa? Escribe help y te muestro los atajos.'
         : `Prueba ${suggestion?.name ?? 'help'}`;
     const nextSuggestion = suggestions[(suggestionIndex + 1) % suggestions.length];
 
     const handleClick = () => {
+        if (sonido) {
+            sonidoJavita();
+        }
         showNextSuggestion();
         scheduleSuggestion();
     };
@@ -115,7 +171,11 @@ export default function Javita({active, activityVersion, reaction, reactionVersi
                 onClick={handleClick}
                 disabled={!active}
             >
-                <JavitaIllustration reaction={reaction} reactionVersion={reactionVersion}/>
+                <JavitaIllustration
+                    emotion={currentEmotion}
+                    reaction={reaction}
+                    reactionVersion={reactionVersion}
+                />
             </button>
         </div>
     );
